@@ -19,7 +19,7 @@ for k in sorted(os.environ):
     if k != 'GITHUB_TOKEN':
         print('{}={}'.format(k, os.getenv(k)))
 
-print(check_output(['git', 'config', '-l']))
+print(check_output(['git', 'config', '-l']).decode())
 # print(check_output(['git', 'config', '-l', '--global']))
 
 if (os.getenv('GITHUB_EVENT_NAME') == 'push') and (
@@ -41,4 +41,4 @@ if (os.getenv('GITHUB_EVENT_NAME') == 'push') and (
         check_call(['git', 'tag', ver_after])
         check_call(['git', 'push', 'origin', 'master'])
 
-print(check_output(['git', 'tag']))
+print(check_output(['git', 'tag']).decode())
