@@ -2,15 +2,19 @@
 
 VARS=`env | cut -d= -f1`
 for var in $VARS; do
-    if [ -f "$var" ]; then
-        echo "File: $var"
-        echo ====================
-        cat $var
-        echo ====================
-    elif [ "$var" = GITHUB_TOKEN ]; then
+    if [ "$var" = GITHUB_TOKEN ]; then
         echo "Variable: GITHUB_TOKEN"
+        continue
+    fi
+    value="${!var}"
+
+    if [ -f "$value" ]; then
+        echo "File: $var=$value"
+        echo ====================
+        cat "$value"
+        echo ====================
     else
-        echo "Variable: $var=${!var}"
+        echo "Variable: $var=$value"
     fi
 done
 
