@@ -15,7 +15,7 @@ def run_git(*args):
     cmd = ['git'] + list(args)
     print(' '.join(cmd))
     out = check_output(cmd)
-    return out.decode()
+    return out.decode().strip()
 
 
 for k in sorted(os.environ):
@@ -35,8 +35,8 @@ if (os.getenv('GITHUB_EVENT_NAME') == 'push') and (
     before = event['before']
     after = event['after']
 
-    ver_before = get_textfile_at_commit(before, 'VERSION.txt').strip()
-    ver_after = get_textfile_at_commit(after, 'VERSION.txt').strip()
+    ver_before = get_textfile_at_commit(before, 'VERSION.txt')
+    ver_after = get_textfile_at_commit(after, 'VERSION.txt')
     print('{} → {} ({} → {})'.format(ver_before, ver_after, before, after))
     assert run_git('rev-parse', 'HEAD') == after
 
