@@ -23,6 +23,8 @@ for k in sorted(os.environ):
         print('{}={}'.format(k, os.getenv(k)))
 
 print(run_git('config', '-l'))
+taglist = run_git('tag').split()
+print('Current tags: {}'.format(taglist))
 
 if (os.getenv('GITHUB_EVENT_NAME') == 'push') and (
         os.getenv('GITHUB_REF') == 'refs/heads/master'):
@@ -35,12 +37,13 @@ if (os.getenv('GITHUB_EVENT_NAME') == 'push') and (
 
     ver_before = get_textfile_at_commit(before, 'VERSION.txt').strip()
     ver_after = get_textfile_at_commit(after, 'VERSION.txt').strip()
+    print('{} → {} ({} → {})'.format(ver_before, ver_after, before, after))
+    assert run_git('rev-parse', 'HEAD') == after
 
-    if ver_before == ver_after:
-        print('{} unchanged'.format(ver_after))
-    else:
-        print('{} → {}'.format(ver_before, ver_after))
+    if ver_before == ver_after and ver_after not in taglist:
+        print('WARNING: Version unchanged in this push but tag does not exist')
+
+    if ver_after not in taglist:
+        print('Tagging {}'.format(ver_after))
         run_git('tag', ver_after)
         run_git('push', 'origin', ver_after)
-
-print(run_git('tag'))
