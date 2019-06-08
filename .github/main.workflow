@@ -5,4 +5,5 @@ workflow "Echo" {
 
 action "Hello World" {
   uses = "./action-a"
+  secrets = ["GITHUB_TOKEN"]
 }
