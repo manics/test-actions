@@ -93,6 +93,7 @@ elif len(sys.argv) == 3:
 else:
     raise ValueError('Expected 0 or 2 arguments (user/repository, commit-ref)')
 
+print('Getting Travis status for {}@{}'.format(userrepo, ref))
 
 # Retry for 2m in case Travis is slow to trigger
 results = get_status(userrepo, ref)
