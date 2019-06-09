@@ -1,14 +1,16 @@
-action "Hello World" {
-  uses = "./action-a"
-  secrets = ["GITHUB_TOKEN"]
-}
-
 workflow "Wait and tag" {
   resolves = ["Tag if changed"]
   on = "push"
 }
 
+# Filter for master branch
+action "Master" {
+  uses = "actions/bin/filter@master"
+  args = "branch master"
+}
+
 action "Wait for Travis" {
+  needs = "Master"
   uses = "./wait-for-travis"
 }
 
