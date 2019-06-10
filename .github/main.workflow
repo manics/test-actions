@@ -32,6 +32,6 @@ action "Docker login" {
 
 action "Docker push" {
   uses = "actions/docker/cli@master"
-  needs = ["Docker build", "Docker Login"]
+  needs = ["Docker build", "Docker login"]
   args = "push manics/test-actions-github ."
 }
