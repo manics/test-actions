@@ -22,7 +22,10 @@ for k in sorted(os.environ):
     if k != 'GITHUB_TOKEN':
         print('{}={}'.format(k, os.getenv(k)))
 
-print(run_git('config', '-l'))
+print('Local git config')
+print(run_git('config', '-l', '--local'))
+print('Global git config')
+print(run_git('config', '-l', '--global'))
 taglist = run_git('tag').split()
 print('Current tags: {}'.format(taglist))
 
