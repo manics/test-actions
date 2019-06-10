@@ -22,11 +22,13 @@ action "Tag if changed" {
 
 action "Docker build" {
   uses = "actions/docker/cli@master"
+  needs = ["Wait for Travis"]
   args = "build -t manics/test-actions-github ."
 }
 
 action "Docker login" {
   uses = "actions/docker/login@master"
+  needs = ["Wait for Travis"]
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
