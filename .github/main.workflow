@@ -19,3 +19,19 @@ action "Tag if changed" {
   needs = ["Wait for Travis"]
   secrets = ["GITHUB_TOKEN"]
 }
+
+action "Docker build" {
+  uses = "actions/docker/cli@master"
+  args = "build -t manics/test-actions-github ."
+}
+
+action "Docker login" {
+  uses = "actions/docker/login@master"
+  secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
+}
+
+action "Docker push" {
+  uses = "actions/docker/cli@master"
+  needs = ["Docker build", "Docker Login"]
+  args = "push manics/test-actions-github ."
+}
