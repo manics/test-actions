@@ -20,23 +20,6 @@ action "Tag if changed" {
   secrets = ["GITHUB_TOKEN"]
 }
 
-action "Docker login" {
-  uses = "actions/docker/login@master"
-  needs = ["Tag if changed"]
-}
-
-action "Docker build" {
-  uses = "actions/docker/cli@master"
-  needs = ["Docker login"]
-  args = "build -t manics/test-actions-github ."
-}
-
-action "Docker push" {
-  uses = "actions/docker/cli@master"
-  needs = ["Docker build"]
-  args = "push manics/test-actions-github ."
-}
-
 action "Docker Login" {
   uses = "actions/docker/login@master"
   needs = ["Tag if changed"]
