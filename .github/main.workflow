@@ -23,7 +23,6 @@ action "Tag if changed" {
 action "Docker login" {
   uses = "actions/docker/login@master"
   needs = ["Tag if changed"]
-  secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
 action "Docker build" {
