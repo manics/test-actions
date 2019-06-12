@@ -15,14 +15,20 @@ if [ -n "${GITHUB_ACTOR:-}" ]; then
 fi
 
 BRANCH=test-gh-push
+REPO=`git remote get-url origin`
 
-echo origin/$BRANCH
-git log -5 origin/$BRANCH
-
-git checkout -b $BRANCH --track origin/$BRANCH
-
-echo $BRANCH
+echo "git clone -b $BRANCH $REPO $REPO-$BRANCH"
+git clone -b $BRANCH $REPO $REPO-$BRANCH
+cd $REPO-$BRANCH
 git log -5
+
+# echo origin/$BRANCH
+# git log -5 origin/$BRANCH
+
+# git checkout -b $BRANCH --track origin/$BRANCH
+
+# echo $BRANCH
+# git log -5
 
 echo "Updating README.txt"
 DATE=`date`
