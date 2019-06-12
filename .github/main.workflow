@@ -48,13 +48,13 @@ workflow "Other test" {
 }
 
 # Filter for master branch
-action "Master" {
+action "Master2" {
   uses = "actions/bin/filter@master"
   args = "branch master"
 }
 
 action "Test GitHub push" {
-  needs = ["Master"]
+  needs = ["Master2"]
   uses = "./test-gh-push"
   secrets = ["GITHUB_TOKEN"]
 }
