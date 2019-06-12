@@ -15,10 +15,20 @@ if [ -n "${GITHUB_ACTOR:-}" ]; then
 fi
 
 BRANCH=test-gh-push
+
+echo origin/$BRANCH
+git log -5 origin/$BRANCH
+
 git checkout $BRANCH
 
+echo $BRANCH
+git log -5
+
+echo "Updating README.txt"
 DATE=`date`
 echo $DATE >> README.txt
 git add README.txt
 git commit -m "$DATE"
+
+echo "Pushing origin HEAD:$BRANCH"
 git push origin HEAD:$BRANCH
