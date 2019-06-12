@@ -1,11 +1,15 @@
 #!/bin/sh
 
-export TERM=xterm
 set -eux
 env
 git config -l --global
-git config -l
+git config -l --local
 ps -ef
+
+git branch
+git branch -r
+
+git fetch origin
 
 if [ -n "${GITHUB_ACTOR:-}" ]; then
     git config --global user.name "$GITHUB_ACTOR"
