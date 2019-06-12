@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM alpine:3.9
 
 LABEL "com.github.actions.name"="Test GitHub push"
 LABEL "com.github.actions.description"="Test modifying and pushign to a GitHub repository"
@@ -9,8 +9,6 @@ LABEL "repository"="http://github.com/manics/test-actions"
 LABEL "homepage"="http://github.com/actions"
 LABEL "maintainer"="http://github.com/manics"
 
-RUN apt-get update && \
-    apt-get install -y git && \
-    rm -rf /var/cache/apt
+RUN apk add --no-cache git
 ADD action.sh /action.sh
 CMD ["/action.sh"]
