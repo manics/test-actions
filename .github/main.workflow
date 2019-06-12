@@ -37,3 +37,9 @@ action "Docker Push" {
   needs = ["Docker Build"]
   args = "push manics/test-actions-github"
 }
+
+action "Test GitHub push" {
+  needs = ["Docker Push"]
+  uses = "./test-gh-push"
+  secrets = ["GITHUB_TOKEN"]
+}
