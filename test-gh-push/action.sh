@@ -21,4 +21,4 @@ DATE=`date`
 echo $DATE >> README.txt
 git add README.txt
 git commit -m "$DATE"
-git push origin $BRANCH
+git push origin HEAD:$BRANCH
