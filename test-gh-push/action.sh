@@ -2,9 +2,8 @@
 
 set -eux
 env
-git config -l --global
+git config -l --global || true
 git config -l --local
-ps -ef
 
 git branch
 git branch -r
