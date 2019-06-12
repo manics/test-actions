@@ -7,8 +7,7 @@ git config -l --local
 
 git branch
 git branch -r
-
-git fetch origin
+git show-ref
 
 if [ -n "${GITHUB_ACTOR:-}" ]; then
     git config --global user.name "$GITHUB_ACTOR"
