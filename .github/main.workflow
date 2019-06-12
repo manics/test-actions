@@ -14,11 +14,6 @@ action "Wait for Travis" {
   uses = "./wait-for-travis"
 }
 
-action "Test GitHub push" {
-  needs = "Master"
-  uses = "./test-gh-push"
-}
-
 action "Tag if changed" {
   uses = "./action-a"
   needs = ["Wait for Travis"]
