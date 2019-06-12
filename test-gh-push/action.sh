@@ -19,7 +19,7 @@ BRANCH=test-gh-push
 echo origin/$BRANCH
 git log -5 origin/$BRANCH
 
-git checkout $BRANCH --track origin/$BRANCH
+git checkout -b $BRANCH --track origin/$BRANCH
 
 echo $BRANCH
 git log -5
