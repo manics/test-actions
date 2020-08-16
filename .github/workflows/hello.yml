@@ -10,5 +10,11 @@ jobs:
       uses: manics/github-action-hello@master
       with:
         who-to-greet: 'Mona the Octocat'
-    - run: echo random-number ${{ steps.foo.outputs.random-number }} 
+    - run: echo random-number ${{ steps.foo.outputs.random-number }}
       shell: bash
+    - run: |
+        echo "kubeconfig: $KUBECONFIG"
+        kubectl get pods --all-namespaces
+      shell: bash
+      env:
+        KUBECONFIG: ${{ steps.foo.outputs.kubeconfig }}
