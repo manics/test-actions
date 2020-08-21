@@ -7,11 +7,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - id: foo
-      uses: manics/github-action-hello@master
-      with:
-        who-to-greet: 'Mona the Octocat'
-    - run: echo random-number ${{ steps.foo.outputs.random-number }}
-      shell: bash
+      uses: manics/action-k3s-helm@master
     - run: |
         echo "kubeconfig: $KUBECONFIG"
         kubectl get pods --all-namespaces
