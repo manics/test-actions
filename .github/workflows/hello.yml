@@ -1,16 +1,50 @@
 on: [push]
 
 jobs:
-  hello_world_job:
+
+  hello_world_job_without_default_matrix_param:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: A job to say hello (without default matrix param)
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false # Do not cancel all jobs if one fails
+      matrix:
+        experimental:
+          - false
+        include:
+          - text: aaaaa (not experimental)
+
+          - text: bbbbb (experimental)
+            experimental: true
+
+          - text: ccc (not experimental)
+
     steps:
-    - uses: actions/checkout@v2
-    - id: foo
-      uses: manics/action-k3s-helm@master
-    - run: |
-        echo "kubeconfig: $KUBECONFIG"
-        kubectl get pods --all-namespaces
-      shell: bash
-      env:
-        KUBECONFIG: ${{ steps.foo.outputs.kubeconfig }}
+      - run: |
+          echo "matrix.text: ${{ matrix.text }}"
+          echo "experimental.text: ${{ matrix.experimental }}"
+
+
+  hello_world_job_with_default_matrix_param:
+    runs-on: ubuntu-latest
+    name: A job to say hello (with default matrix param)
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false # Do not cancel all jobs if one fails
+      matrix:
+        experimental:
+          - false
+        include:
+          - text: aaaaa (not experimental)
+            experimental: false
+
+          - text: bbbbb (experimental)
+            experimental: true
+
+          - text: ccc (not experimental)
+            experimental: false
+
+    steps:
+      - run: |
+          echo "matrix.text: ${{ matrix.text }}"
+          echo "experimental.text: ${{ matrix.experimental }}"
