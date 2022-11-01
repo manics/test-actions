@@ -32,8 +32,6 @@ jobs:
     strategy:
       fail-fast: false # Do not cancel all jobs if one fails
       matrix:
-        experimental:
-          - false
         include:
           - text: aaaaa (not experimental)
             experimental: false
@@ -41,7 +39,7 @@ jobs:
           - text: bbbbb (experimental)
             experimental: true
 
-          - text: ccc (not experimental)
+          - text: ccccc (not experimental)
             experimental: false
 
     steps:
