@@ -46,3 +46,28 @@ jobs:
       - run: |
           echo "matrix.text: ${{ matrix.text }}"
           echo "experimental.text: ${{ matrix.experimental }}"
+
+  registry-podman-test:
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: docker.io/library/registry:latest
+        ports:
+          - 5000:5000
+
+    steps:
+      - run: |
+          set -x
+          IP=$(hostname -I | awk '{print $1}')
+          mkdir -p ~/.config/containers/
+          cat << EOF > ~/.config/containers/registries.conf
+          [[registry]]
+          location="$IP:5000"
+          insecure=true
+          EOF
+          
+          podman pull docker.io/library/busybox
+          podman image tag docker.io/library/busybox "$IP:5000/x/busybox"
+          podman push "$IP:5000/x/busybox"
+          podman image ls
+
