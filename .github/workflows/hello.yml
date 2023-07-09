@@ -24,7 +24,7 @@ jobs:
           date >> test.txt
 
       - name: Upload plan
-        if: ${{ steps.plan.outputs.apply }} == "yes"
+        if: steps.plan.outputs.apply
         uses: actions/upload-artifact@v3
         with:
           name: test
@@ -35,14 +35,14 @@ jobs:
       - plan
     runs-on: ubuntu-22.04
     timeout-minutes: 2
-    if: ${{ needs.plan.outputs.apply }} == "yes"
+    if: needs.plan.outputs.apply
 
     steps:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
 
-      - run: ls -l
+      - run: ls -lR
 
   apply:
     needs:
