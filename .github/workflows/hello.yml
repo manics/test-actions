@@ -1,73 +1,56 @@
-on: [push]
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
 
-  hello_world_job_without_default_matrix_param:
-    runs-on: ubuntu-latest
-    name: A job to say hello (without default matrix param)
-    continue-on-error: ${{ matrix.experimental }}
-    strategy:
-      fail-fast: false # Do not cancel all jobs if one fails
-      matrix:
-        experimental:
-          - false
-        include:
-          - text: aaaaa (not experimental)
-
-          - text: bbbbb (experimental)
-            experimental: true
-
-          - text: ccc (not experimental)
+  plan:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
+    outputs:
+      apply: ${{ steps.plan.outputs.apply }}
 
     steps:
-      - run: |
-          echo "matrix.text: ${{ matrix.text }}"
-          echo "experimental.text: ${{ matrix.experimental }}"
+      - name: plan
+        id: plan
+        run: |
+          echo "apply=yes" >> "$GITHUB_OUTPUT"
+          date >> test.txt
 
+      - name: Upload plan
+        if: ${{ steps.plan.outputs.apply }} == "yes"
+        uses: actions/upload-artifact@v3
+        with:
+          name: test
+          path: test.txt
 
-  hello_world_job_with_default_matrix_param:
-    runs-on: ubuntu-latest
-    name: A job to say hello (with default matrix param)
-    continue-on-error: ${{ matrix.experimental }}
-    strategy:
-      fail-fast: false # Do not cancel all jobs if one fails
-      matrix:
-        include:
-          - text: aaaaa (not experimental)
-            experimental: false
-
-          - text: bbbbb (experimental)
-            experimental: true
-
-          - text: ccccc (not experimental)
-            experimental: false
+  decision:
+    needs:
+      - plan
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
+    if: ${{ needs.plan.outputs.apply }} == "yes"
 
     steps:
-      - run: |
-          echo "matrix.text: ${{ matrix.text }}"
-          echo "experimental.text: ${{ matrix.experimental }}"
 
-  registry-podman-test:
-    runs-on: ubuntu-latest
-    services:
-      registry:
-        image: docker.io/library/registry:latest
-        ports:
-          - 5000:5000
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - run: ls -l
+
+  apply:
+    needs:
+      - decision
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
 
     steps:
-      - run: |
-          set -x
-          IP=$(hostname -I | awk '{print $1}')
-          mkdir -p ~/.config/containers/
-          cat << EOF > ~/.config/containers/registries.conf
-          [[registry]]
-          location="$IP:5000"
-          insecure=true
-          EOF
-          
-          podman pull docker.io/library/busybox
-          podman image tag docker.io/library/busybox "$IP:5000/x/busybox"
-          podman push "$IP:5000/x/busybox"
-          podman image ls
 
+      - name: Download plan
+        uses: actions/download-artifact@v3
+        with:
+          name: test
+
+      - name: Apply
+        run: |
+          cat test.txt
