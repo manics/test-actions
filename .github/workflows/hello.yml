@@ -1,6 +1,12 @@
 on:
   push:
   workflow_dispatch:
+    inputs:
+      apply:
+        type: boolean
+        description: assume changes
+        required: true
+        default: true
 
 jobs:
 
@@ -14,7 +20,7 @@ jobs:
       - name: plan
         id: plan
         run: |
-          echo "apply=yes" >> "$GITHUB_OUTPUT"
+          echo "apply=${{ inputs.apply }}" >> "$GITHUB_OUTPUT"
           date >> test.txt
 
       - name: Upload plan
