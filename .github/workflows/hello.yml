@@ -30,25 +30,13 @@ jobs:
           name: test
           path: test.txt
 
-  decision:
+  apply:
     needs:
       - plan
     runs-on: ubuntu-22.04
     timeout-minutes: 2
     if: needs.plan.outputs.apply
-
-    steps:
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
-
-      - run: ls -lR
-
-  apply:
-    needs:
-      - decision
-    runs-on: ubuntu-22.04
-    timeout-minutes: 2
+    environment: test-plan-apply
 
     steps:
 
