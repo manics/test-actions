@@ -1,0 +1,134 @@
+on:
+  workflow_dispatch:
+            
+jobs:
+  stale-prs:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          ZULIP_AUTH: ${{ secrets.ZULIP_AUTH }}
+          CHANNEL: jupyterhub
+        with:
+          script: |
+            const d = new Date()
+            d.setDate(d.getDate()-60)
+            const old = d.toISOString().substring(0,10)
+            const query = `query($start: String!) {
+              search(
+                type: ISSUE
+                first: 100
+                after: $start
+                query: "org:jupyterhub is:open is:pr updated:<${old} draft:false -author:dependabot[bot] -author:jupyterhub-bot"
+              ) {
+                edges {
+                  node {
+                    ...on PullRequest {
+                      number
+                      repository {
+                        nameWithOwner
+                      }
+                      author {
+                        login
+                      }
+                      title
+                      isDraft
+                      labels(first:100) {
+                        nodes {
+                          name
+                        }
+                      }
+                      mergeable
+                      updatedAt
+                      url
+                    }
+                  }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+              }
+            }`
+            const variables = {
+              start: ""
+            }
+            console.log(query)
+            let count = 0
+            let result = null
+            let results = []
+            while(result === null || result.search.pageInfo.hasNextPage) {
+              count++
+              if (result) {
+                variables.start = result.search.pageInfo.endCursor
+              }
+              console.log(`Fetching page ${count}`)
+              result = await github.graphql(query, variables)
+              //console.log(JSON.stringify(result, null, 2))
+              const nodes = result.search.edges.map(e => e.node)
+              results.push(...nodes)
+              //if (count > 2) break
+            }
+            console.log(JSON.stringify(results, null, 2))
+
+            const data = results
+
+            // Assuming 'credential' is something like "email:api_key"
+            const credential = process.env.ZULIP_AUTH
+            const _auth = new Buffer.from(credential).toString('base64');
+
+            const url = "https://jupyter.zulipchat.com/api/v1/messages";
+
+            const lines = [[]]
+            let nchunk = 0
+            let current_len = 0
+            // Default max message length is 10000
+            const max_len = 9000
+            for (const pr of data) {
+              const title = pr.title.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\s+/g,' ')
+              const line = `- ${pr.repository.nameWithOwner}#${pr.number} ${pr.author.login} [${title}](${pr.url})\n`
+              if (current_len + line.length <= max_len) {
+                lines[nchunk].push(line)
+                current_len += line.length
+              } else {
+                nchunk++
+                lines[nchunk] = [line]
+                current_len = line.length
+              }
+            }
+            // lines = data.map(pr => `- ${pr.repository.nameWithOwner}#${pr.number} ${pr.author.login} [${pr.title}](${pr.url})`)
+            summary = `# ${data.length} stale PRs found`
+
+            for (let chunk=0; chunk<=nchunk; ++chunk) {
+              let content = lines[chunk].join("")
+              if (chunk == 0) {
+                content = `${summary}\n\n` + content
+              }
+              // Data to be sent in x-www-form-urlencoded format
+              const formData = new URLSearchParams({
+                type: "stream",
+                to: process.env.CHANNEL,
+                content: content,
+                topic: "Stale PRs (no activity for 60+ days)"
+              });
+
+              const r = await fetch(url, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "User-Agent": "JupyterHub Stale PR Bot",
+                  "Authorization": `Basic ${_auth}`,
+                },
+                body: formData.toString(),
+              });
+
+              if (!r.ok) {
+                const errorData = await r.json();
+                console.error("Error Response:", errorData);
+                break
+              } else {
+                const data = await r.json();
+                console.log("Message sent successfully:", data);
+              }
+            }
