@@ -1,0 +1,52 @@
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+
+  networks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - run: |
+          ip addr show
+          ip route show
+          hostname -I
+          docker network ls
+
+      - name: Create IPv4+IPv6 network
+        run: docker network create --ipv6 testnet --subnet 2001:db8::/64
+
+      - name: Start minimal notebook
+        run: |
+          docker run -d --name testnotebook --net=testnet quay.io/jupyter/minimal-notebook
+          sleep 15
+
+      - name: Check public IPv4 connectivity
+        run: |
+          set -x
+          IP4=$(docker inspect testnotebook --format '{{.NetworkSettings.Networks.testnet.IPAddress}}')
+          if [ -z "$IP4" ]; then
+            echo "Failed to lookup IPv4 for container"
+            exit 1
+          fi
+          docker exec testnotebook curl -sS "http://$IP4:8888/api"
+
+      - name: Check public IPv6 connectivity
+        run: |
+          set -x
+          IP6=$(docker inspect testnotebook --format '{{.NetworkSettings.Networks.testnet.GlobalIPv6Address}}')
+          if [ -z "$IP6" ]; then
+            echo "Failed to lookup IPv6 for container"
+            exit 1
+          fi
+          curl -f "http://[$IP6]:8888/api"
+          docker exec testnotebook curl -sS "http://[$IP6]:8888/api"
+
+      - name: Container
+        if: always()
+        run: docker inspect testnotebook
+
+      - name: Logs
+        if: always()
+        run: docker logs testnotebook
