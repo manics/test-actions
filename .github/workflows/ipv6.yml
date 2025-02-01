@@ -15,12 +15,31 @@ jobs:
           docker network ls
 
       - name: Create IPv4+IPv6 network
-        run: docker network create --ipv6 testnet --subnet 2001:db8::/64
+        run: |
+          # SUBNET=$(python -c 'from random import  randint; print("fe80:" + ":".join(hex(randint(0,2**16))[2:] for _ in range(3)) + "::/64")')
+          SUBNET=$(python -c 'from random import  randint; print("fc00:" + ":".join(hex(randint(0,2**16))[2:] for _ in range(3)) + "::/64")')
+          echo $SUBNET
+          docker network create --ipv6 testnet --subnet "$SUBNET" --internal --gateway "${SUBNET%/*}1"
+
+      - name: show networks
+        run: |
+          for f in $(docker network ls -q); do
+            echo "***** $f *****"
+            docker network inspect $f
+          done
 
       - name: Start minimal notebook
         run: |
           docker run -d --name testnotebook --net=testnet quay.io/jupyter/minimal-notebook
           sleep 15
+
+      - name: jupyter_server_config
+        run: |
+          set -x
+          docker exec testnotebook hostname -I
+          # curl "http://127.0.0.1:8888/api"
+          # curl "http://[::1]:8888/api"
+          docker exec testnotebook cat /etc/jupyter/jupyter_server_config.py
 
       - name: Check public IPv4 connectivity
         run: |
