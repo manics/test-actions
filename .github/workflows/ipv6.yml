@@ -16,10 +16,9 @@ jobs:
 
       - name: Create IPv4+IPv6 network
         run: |
-          # SUBNET=$(python -c 'from random import  randint; print("fe80:" + ":".join(hex(randint(0,2**16))[2:] for _ in range(3)) + "::/64")')
           SUBNET=$(python -c 'from random import  randint; print("fc00:" + ":".join(hex(randint(0,2**16))[2:] for _ in range(3)) + "::/64")')
           echo $SUBNET
-          docker network create --ipv6 testnet --subnet "$SUBNET" --internal --gateway "${SUBNET%/*}1"
+          docker network create --ipv6 testnet --subnet "$SUBNET" --internal
 
       - name: show networks
         run: |
