@@ -11,7 +11,7 @@
 # Time:2025-05-02T11:34:12.6250694Z</Message><AuthenticationErrorDetail>Signature not valid in the specified time frame: Start [Fri, 02 May 2025 10:47:50 GMT] - Expiry [Fri, 02 May 2025 10:57:55 GMT] - Current [Fri, 02 May 2025 11:34:12 GMT]</AuthenticationErrorDetail></Error>
 # --------------------------------------------------------------------------------
 
-FROM busybox
+FROM docker.io/library/busybox:1.36.1-glibc
 
 RUN for n in `seq 15`; do echo -n "$n: "; date; sleep 1m; done
 
