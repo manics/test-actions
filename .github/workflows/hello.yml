@@ -37,4 +37,6 @@ jobs:
       - run: |
           ls -lh ~
           echo ${{ steps.space.outputs.available-space }}
+          sync
+          df -h
 
