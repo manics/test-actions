@@ -30,3 +30,17 @@ jobs:
       - run: sort -n du.txt
 
       - run: echo "${{ steps.df.outputs.df }}"
+
+      - run: df -m
+
+      - name: Clean some files
+        run: |
+          rm -rf \
+            /usr/local/lib/android \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL \
+            /opt/microsoft/ \
+            /usr/local/share \
+            /usr/share/swift/ \
+
+      - run: df -m
