@@ -45,6 +45,9 @@ jobs:
       #       /usr/local/share \
       #       /usr/share/swift/ \
 
-      # - run: df -m
+      - run: |
+          pwd
+          df -m
+          df -m ~/
 
-      - run: node diskspace.js filler.dat 30000
+      - run: node diskspace.js ~/filler.dat 30000
