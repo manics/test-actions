@@ -13,7 +13,7 @@ jobs:
     steps:
       - id: du
         run: |
-          sudo du -m / > du.txt
+          sudo du -m --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/tmp / > du.txt
 
       - id: df
         run: |
