@@ -15,5 +15,5 @@ runs:
   steps:
     - name: Run script
       id: script
-      run: sudo node $GITHUB_ACTION_PATH/diskspace.js filler.dat "${{ inputs.desired-space }}"
+      run: sudo GITHUB_OUTPUT="$GITHUB_OUTPUT" node "$GITHUB_ACTION_PATH/diskspace.js" ~/filler.dat "${{ inputs.desired-space }}"
       shell: bash

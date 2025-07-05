@@ -34,5 +34,7 @@ jobs:
         with:
           desired-space: "30000"
 
-      - run: echo ${{ steps.space.outputs.available-space }}
+      - run: |
+          ls -lh ~
+          echo ${{ steps.space.outputs.available-space }}
 
