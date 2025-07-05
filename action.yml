@@ -14,6 +14,5 @@ runs:
   using: "composite"
   steps:
     - name: Run script
-      run: $GITHUB_ACTION_PATH/diskspace.js filler.dat "${{ inputs.desired-space }}"
-      shell: node
-
+      run: node $GITHUB_ACTION_PATH/diskspace.js filler.dat "${{ inputs.desired-space }}"
+      shell: bash
