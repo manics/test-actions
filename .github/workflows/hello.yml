@@ -1,50 +1,32 @@
 on:
   push:
   workflow_dispatch:
-    inputs:
-      apply:
-        type: boolean
-        description: assume changes
-        required: true
-        default: true
 
 jobs:
 
-  plan:
+  df:
     runs-on: ubuntu-24.04
-    timeout-minutes: 2
+    timeout-minutes: 5
     outputs:
       apply: ${{ steps.plan.outputs.apply }}
 
     steps:
-      - name: plan
-        id: plan
+      - id: du
         run: |
-          echo "apply=${{ inputs.apply }}" >> "$GITHUB_OUTPUT"
-          date >> test.txt
+          du -m / > du.txt
 
-      - name: Upload plan
-        if: steps.plan.outputs.apply
+      - id: df
+        run: |
+          echo "df<<EOF" >> "$GITHUB_OUTPUT"
+          df -m --output=avail,source,target >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Upload du
         uses: actions/upload-artifact@v4
         with:
-          name: test
-          path: test.txt
+          name: du
+          path: du.txt
 
-  apply:
-    needs:
-      - plan
-    runs-on: ubuntu-24.04
-    timeout-minutes: 2
-    if: needs.plan.outputs.apply
-    environment: test-plan-apply
+      - run: sort -n du.txt
 
-    steps:
-
-      - name: Download plan
-        uses: actions/download-artifact@v4
-        with:
-          name: test
-
-      - name: Apply
-        run: |
-          cat test.txt
+      - run: echo ${{steps.df.outputs.df}}
