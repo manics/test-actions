@@ -4,24 +4,17 @@ on:
 
 jobs:
 
-  df:
+  du:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
-    outputs:
-      apply: ${{ steps.plan.outputs.apply }}
+    if: false
 
     steps:
       - uses: actions/checkout@v4
 
-      - id: du
-        run: |
-          sudo du -m --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/tmp / > du.txt
-
-      # - id: df
+      # - id: du
       #   run: |
-      #     echo "df<<EOF" >> "$GITHUB_OUTPUT"
-      #     sudo df -m --output=avail,source,target >> "$GITHUB_OUTPUT"
-      #     echo "EOF" >> "$GITHUB_OUTPUT"
+      #     sudo du -m --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/tmp / > du.txt
 
       - name: Upload du
         uses: actions/upload-artifact@v4
@@ -29,25 +22,17 @@ jobs:
           name: du
           path: du.txt
 
-      # - run: sort -n du.txt
+      # - run: node diskspace.js ~/filler.dat 30000
 
-      # - run: echo "${{ steps.df.outputs.df }}"
+  composite-action:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
 
-      # - run: df -m
+    steps:
+      - uses: manics/test-actions@main
+        id: space
+        with:
+          desired-space: "30000"
 
-      # - name: Clean some files
-      #   run: |
-      #     sudo rm -rf \
-      #       /usr/local/lib/android \
-      #       /usr/local/.ghcup \
-      #       /opt/hostedtoolcache/CodeQL \
-      #       /opt/microsoft/ \
-      #       /usr/local/share \
-      #       /usr/share/swift/ \
+      - run: echo ${{ steps.space.outputs.available-space }}
 
-      - run: |
-          pwd
-          df -m
-          df -m ~/
-
-      - run: node diskspace.js ~/filler.dat 30000

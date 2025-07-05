@@ -1,0 +1,19 @@
+name: Free up disk space
+description: Free up disk space on Ubuntu runners
+inputs:
+  desired-space:
+    description: Desired free space in MB
+    required: true
+    default: "20000"
+outputs:
+  available-space:
+    description: Available space
+    value: ${{ steps.random-number-generator.outputs.random-number }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run script
+      run: $GITHUB_ACTION_PATH/diskspace.js filler.dat "${{ inputs.desired-space }}"
+      shell: node
+

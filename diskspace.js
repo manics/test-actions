@@ -51,11 +51,19 @@ async function createZeroFile(path, sizeMB) {
         throw new Error("Failed to write chunk");
       }
       written += 1
-
     }
+    await fileHandle.sync();
   } finally {
     await fileHandle.close();
   }
+}
+
+async function setGithubOutput(name, value) {
+  const githubOutputPath = process.env.GITHUB_OUTPUT;
+  if (!githubOutputPath) {
+    throw new Error('GITHUB_OUTPUT environment variable not found');
+  }
+  await fs.appendFileSync(githubOutputPath, `${name}=${value}\n`);
 }
 
 async function main() {
@@ -69,20 +77,22 @@ async function main() {
   const fileName = args[0];
   const desiredAvailableMB = parseInt(args[1]);
 
-  await getFreeDiskSpaceMB("/");
+  let availableMB = await getFreeDiskSpaceMB("/");
+  if (availableMB < desiredAvailableMB) {
+    await deleteDirectories(directoriesToRemove);
+    availableMB = await getFreeDiskSpaceMB("/");
+  }
 
-  await deleteDirectories(directoriesToRemove);
-
-  const availableMB = await getFreeDiskSpaceMB("/");
   const fillerMB = availableMB - desiredAvailableMB;
-  if (fillerMB <= 0) {
+  if (fillerMB < 0) {
     console.error(`Available space ${desiredAvailableMB} is less then desired`);
   } else {
     console.log(`Creating ${fillerMB} MB filler file`);
     createZeroFile(fileName, fillerMB);
   }
 
-  await getFreeDiskSpaceMB("/");
+  availableMB = await getFreeDiskSpaceMB("/");
+  setGithubOutput("available-space", availableMB)
 }
 
 main()
