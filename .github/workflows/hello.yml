@@ -29,4 +29,4 @@ jobs:
 
       - run: sort -n du.txt
 
-      - run: echo ${{steps.df.outputs.df}}
+      - run: echo "${{ steps.df.outputs.df }}"
