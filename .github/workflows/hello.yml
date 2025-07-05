@@ -44,3 +44,7 @@ jobs:
             /usr/share/swift/ \
 
       - run: df -m
+
+      - run: docker system prune -a -f
+
+      - run: df -m
