@@ -8,11 +8,12 @@ inputs:
 outputs:
   available-space:
     description: Available space
-    value: ${{ steps.random-number-generator.outputs.random-number }}
+    value: ${{ steps.script.outputs.available-space }}
 
 runs:
   using: "composite"
   steps:
     - name: Run script
+      id: script
       run: node $GITHUB_ACTION_PATH/diskspace.js filler.dat "${{ inputs.desired-space }}"
       shell: bash
