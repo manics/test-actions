@@ -1,4 +1,9 @@
 const fs = require('fs/promises');
+const { exec } = require('child_process');
+const util = require('util');
+
+// Promisify the exec function
+const execPromise = util.promisify(exec);
 
 const directoriesToRemove = [
   '/usr/local/lib/android',
@@ -66,6 +71,13 @@ async function setGithubOutput(name, value) {
   await fs.appendFile(githubOutputPath, `${name}=${value}\n`);
 }
 
+async function fsSync() {
+  console.log('Global filesystem sync');
+  const { stdout, stderr } = await execPromise('sync');
+  if (stdout) console.log('sync stdout:', stdout);
+  if (stderr) console.error('sync stderr:', stderr);
+}
+
 async function main() {
   // arg0:node arg1:script
   const args = process.argv.slice(2);
@@ -91,6 +103,7 @@ async function main() {
     createZeroFile(fileName, fillerMB);
   }
 
+  await fsSync();
   availableMB = await getFreeDiskSpaceMB("/");
   setGithubOutput("available-space", availableMB)
 }
