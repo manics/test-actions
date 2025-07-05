@@ -20,16 +20,16 @@ outputs:
     value: ${{ steps.script.outputs.available-space }}
 
 runs:
-  using: "composite"
+  using: composite
   steps:
 
     - id: du
-      if: inputs.audit-space == "true"
+      if: inputs.audit-space == 'true'
       run: sudo du -m --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/tmp / > du.txt
       shell: bash
 
     - name: Upload du
-      if: inputs.audit-space == "true"
+      if: inputs.audit-space == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: du
