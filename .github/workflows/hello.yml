@@ -13,12 +13,12 @@ jobs:
     steps:
       - id: du
         run: |
-          du -m / > du.txt
+          sudo du -m / > du.txt
 
       - id: df
         run: |
           echo "df<<EOF" >> "$GITHUB_OUTPUT"
-          df -m --output=avail,source,target >> "$GITHUB_OUTPUT"
+          sudo df -m --output=avail,source,target >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Upload du
