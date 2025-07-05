@@ -11,15 +11,17 @@ jobs:
       apply: ${{ steps.plan.outputs.apply }}
 
     steps:
+      - uses: actions/checkout@v4
+
       - id: du
         run: |
           sudo du -m --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/tmp / > du.txt
 
-      - id: df
-        run: |
-          echo "df<<EOF" >> "$GITHUB_OUTPUT"
-          sudo df -m --output=avail,source,target >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+      # - id: df
+      #   run: |
+      #     echo "df<<EOF" >> "$GITHUB_OUTPUT"
+      #     sudo df -m --output=avail,source,target >> "$GITHUB_OUTPUT"
+      #     echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Upload du
         uses: actions/upload-artifact@v4
@@ -27,24 +29,22 @@ jobs:
           name: du
           path: du.txt
 
-      - run: sort -n du.txt
+      # - run: sort -n du.txt
 
-      - run: echo "${{ steps.df.outputs.df }}"
+      # - run: echo "${{ steps.df.outputs.df }}"
 
-      - run: df -m
+      # - run: df -m
 
-      - name: Clean some files
-        run: |
-          sudo rm -rf \
-            /usr/local/lib/android \
-            /usr/local/.ghcup \
-            /opt/hostedtoolcache/CodeQL \
-            /opt/microsoft/ \
-            /usr/local/share \
-            /usr/share/swift/ \
+      # - name: Clean some files
+      #   run: |
+      #     sudo rm -rf \
+      #       /usr/local/lib/android \
+      #       /usr/local/.ghcup \
+      #       /opt/hostedtoolcache/CodeQL \
+      #       /opt/microsoft/ \
+      #       /usr/local/share \
+      #       /usr/share/swift/ \
 
-      - run: df -m
+      # - run: df -m
 
-      - run: docker system prune -a -f
-
-      - run: df -m
+      - run: node diskspace.js filler.dat 30000
