@@ -22,25 +22,34 @@ async function getFreeDiskSpaceMB(path) {
 }
 
 async function deleteDirectories(directories) {
-  let errors = 0;
-  for (const dirPath of directories) {
-    console.log(`Deleting: ${dirPath}`);
+  const deletionPromises = directories.map(async (dirPath) => {
     try {
+      console.log(`Deleting: ${dirPath}`);
       await fs.rm(dirPath, { recursive: true, force: true });
+      return { dirPath, status: 'success' };
     } catch (error) {
-      // Handle errors, e.g., directory not found, permission issues
       if (error.code === 'ENOENT') {
         console.warn(`Directory not found: ${dirPath}`);
-        errors += 1
+        return { dirPath, status: 'error', reason: 'ENOENT - Directory not found' };
       } else if (error.code === 'EPERM' || error.code === 'EACCES') {
         console.error(`Permission denied: ${dirPath}`);
-        errors += 1
+        return { dirPath, status: 'error', reason: 'EPERM/EACCES - Permission denied' };
       } else {
-        console.error(`Error removing ${dirPath}:`, error);
-        errors += 1
+        console.error(`Error deleting ${dirPath}:`, error);
+        return { dirPath, status: 'error', reason: `Unknown error: ${error.message}` };
       }
     }
-  }
+  });
+
+  const results = await Promise.allSettled(deletionPromises);
+
+  let errors = 0;
+  results.forEach(result => {
+    if (result.status === 'error') {
+      errors++;
+    }
+  });
+  return errors;
 }
 
 async function createZeroFile(path, sizeMB) {
