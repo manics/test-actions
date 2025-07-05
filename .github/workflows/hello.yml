@@ -14,7 +14,7 @@ jobs:
           - "false"
 
     steps:
-      - uses: manics/test-actions@main
+      - uses: manics/action-free-disk-space@main
         id: space
         with:
           desired-space: "30000"
