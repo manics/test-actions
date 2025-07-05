@@ -4,35 +4,21 @@ on:
 
 jobs:
 
-  du:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    if: false
-
-    steps:
-      - uses: actions/checkout@v4
-
-      # - id: du
-      #   run: |
-      #     sudo du -m --exclude=/dev --exclude=/proc --exclude=/sys --exclude=/tmp / > du.txt
-
-      - name: Upload du
-        uses: actions/upload-artifact@v4
-        with:
-          name: du
-          path: du.txt
-
-      # - run: node diskspace.js ~/filler.dat 30000
-
   composite-action:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    strategy:
+      matrix:
+        audit-space:
+          - "true"
+          - "false"
 
     steps:
       - uses: manics/test-actions@main
         id: space
         with:
           desired-space: "30000"
+          audit-space: ${{ matrix.audit-space }}
 
       - run: |
           ls -lh ~

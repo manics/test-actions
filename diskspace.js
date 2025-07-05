@@ -106,14 +106,16 @@ async function main() {
 
   const fillerMB = availableMB - desiredAvailableMB;
   if (fillerMB < 0) {
-    console.error(`Available space ${desiredAvailableMB} is less then desired`);
+    console.error(`Available space ${availableMB} is less then desired ${desiredAvailableMB}`);
   } else {
     console.log(`Creating ${fillerMB} MB filler file`);
     createZeroFile(fileName, fillerMB);
+    await fsSync();
+    // fs.statfs doesn't seem to update ☹
+    // availableMB = await getFreeDiskSpaceMB("/");
+    availableMB -= fillerMB;
   }
 
-  await fsSync();
-  availableMB = await getFreeDiskSpaceMB("/");
   setGithubOutput("available-space", availableMB)
 }
 
