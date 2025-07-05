@@ -63,7 +63,7 @@ async function setGithubOutput(name, value) {
   if (!githubOutputPath) {
     throw new Error('GITHUB_OUTPUT environment variable not found');
   }
-  await fs.appendFileSync(githubOutputPath, `${name}=${value}\n`);
+  await fs.appendFile(githubOutputPath, `${name}=${value}\n`);
 }
 
 async function main() {
