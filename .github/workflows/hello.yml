@@ -8,16 +8,23 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     strategy:
+      fail-fast: false
       matrix:
         audit-space:
-          - "true"
           - "false"
+        desired-space:
+          - "10000"
+          - "40000"
+          - "1000000"
+        include:
+          - audit-space: "true"
+            desired-space: "40000"
 
     steps:
-      - uses: manics/action-free-disk-space@main
+      - uses: manics/action-free-disk-space@1.0.0
         id: space
         with:
-          desired-space: "30000"
+          desired-space: ${{ matrix.desired-space }}
           audit-space: ${{ matrix.audit-space }}
 
       - run: |
