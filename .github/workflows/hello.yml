@@ -28,6 +28,9 @@ jobs:
           audit-space: ${{ matrix.audit-space }}
 
       - run: |
+          env
+
+      - run: |
           ls -lh ~
           echo ${{ steps.space.outputs.available-space }}
           sync
